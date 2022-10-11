@@ -23,7 +23,7 @@ use crate::{
         monitor, view, EventLoopWindowTarget, MonitorHandle,
     },
     window::{
-        CursorGrabMode, CursorIcon, Fullscreen, UserAttentionType, WindowAttributes,
+        CursorGrabMode, CursorIcon, Fullscreen, ResizeDirection, UserAttentionType, WindowAttributes,
         WindowId as RootWindowId,
     },
 };
@@ -194,6 +194,10 @@ impl Inner {
     }
 
     pub fn drag_window(&self) -> Result<(), ExternalError> {
+        Err(ExternalError::NotSupported(NotSupportedError::new()))
+    }
+
+    pub fn drag_resize_window(&self, _direction: ResizeDirection) -> Result<(), ExternalError> {
         Err(ExternalError::NotSupported(NotSupportedError::new()))
     }
 

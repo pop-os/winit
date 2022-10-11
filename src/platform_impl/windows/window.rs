@@ -71,7 +71,7 @@ use crate::{
         window_state::{CursorFlags, SavedWindow, WindowFlags, WindowState},
         Parent, PlatformSpecificWindowBuilderAttributes, WindowId,
     },
-    window::{CursorGrabMode, CursorIcon, Fullscreen, Theme, UserAttentionType, WindowAttributes},
+    window::{CursorGrabMode, CursorIcon, Fullscreen, Theme, ResizeDirection, UserAttentionType, WindowAttributes},
 };
 
 /// The Win32 implementation of the main `Window` object.
@@ -370,6 +370,11 @@ impl Window {
         }
 
         Ok(())
+    }
+
+    #[inline]
+    pub fn drag_resize_window(&self, _direction: ResizeDirection) -> Result<(), ExternalError> {
+        Err(ExternalError::NotSupported(NotSupportedError::new()))
     }
 
     #[inline]

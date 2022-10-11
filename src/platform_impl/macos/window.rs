@@ -32,7 +32,7 @@ use crate::{
         OsError,
     },
     window::{
-        CursorGrabMode, CursorIcon, Fullscreen, UserAttentionType, WindowAttributes,
+        CursorGrabMode, CursorIcon, Fullscreen, ResizeDirection, UserAttentionType, WindowAttributes,
         WindowId as RootWindowId,
     },
 };
@@ -703,6 +703,11 @@ impl UnownedWindow {
         }
 
         Ok(())
+    }
+
+    #[inline]
+    pub fn drag_resize_window(&self, _direction: ResizeDirection) -> Result<(), ExternalError> {
+        Err(ExternalError::NotSupported(NotSupportedError::new()))
     }
 
     #[inline]
