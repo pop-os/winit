@@ -7,6 +7,7 @@ Please keep one empty line before and after all headers. (This is required for `
 And please only add new entries to the top of this list, right below the `# Unreleased` header.
 
 # Unreleased
+- Add mouse side button detection for Wayland.
 
 # 0.28.6
 

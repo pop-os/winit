@@ -22,6 +22,10 @@ use super::{PointerData, WinitPointer};
 const BTN_LEFT: u32 = 0x110;
 const BTN_RIGHT: u32 = 0x111;
 const BTN_MIDDLE: u32 = 0x112;
+/// The fourth non-scroll button, which is often used as "back" in web browsers.
+const BTN_SIDE: u32 = 0x113;
+/// The fifth non-scroll button, which is often used as "forward" in web browsers.
+const BTN_EXTRA: u32 = 0x114;
 
 #[inline]
 pub(super) fn handle_pointer(
@@ -171,6 +175,8 @@ pub(super) fn handle_pointer(
                 BTN_LEFT => MouseButton::Left,
                 BTN_RIGHT => MouseButton::Right,
                 BTN_MIDDLE => MouseButton::Middle,
+                BTN_SIDE => MouseButton::Back,
+                BTN_EXTRA => MouseButton::Forward,
                 button => MouseButton::Other(button as u16),
             };
 
