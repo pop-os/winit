@@ -23,7 +23,7 @@ use crate::platform_impl::wayland::protocols::wp_fractional_scale_v1::WpFraction
 use crate::platform_impl::wayland::seat::pointer::WinitPointer;
 use crate::platform_impl::wayland::seat::text_input::TextInputHandler;
 use crate::platform_impl::wayland::WindowId;
-use crate::window::{CursorGrabMode, CursorIcon, ImePurpose, Theme, UserAttentionType};
+use crate::window::{CursorGrabMode, CursorIcon, ImePurpose, ResizeDirection, Theme, UserAttentionType};
 
 use super::WinitFrame;
 
@@ -52,6 +52,9 @@ pub enum WindowRequest {
 
     /// Drag window.
     DragWindow,
+
+    /// Drag and resize window.
+    DragResizeWindow(ResizeDirection),
 
     /// Maximize the window.
     Maximize(bool),
@@ -463,6 +466,12 @@ impl WindowHandle {
             pointer.drag_window(&self.window);
         }
     }
+
+    pub fn drag_resize_window(&self, direction: ResizeDirection) {
+        for pointer in self.pointers.iter() {
+            pointer.drag_resize_window(&self.window, direction);
+        }
+    }
 }
 
 #[inline]
@@ -508,6 +517,9 @@ pub fn handle_window_requests(winit_state: &mut WinitState) {
                 }
                 WindowRequest::DragWindow => {
                     window_handle.drag_window();
+                }
+                WindowRequest::DragResizeWindow(direction) => {
+                    window_handle.drag_resize_window(direction);
                 }
                 WindowRequest::Maximize(maximize) => {
                     if maximize {

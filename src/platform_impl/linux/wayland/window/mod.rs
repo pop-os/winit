@@ -606,8 +606,10 @@ impl Window {
     }
 
     #[inline]
-    pub fn drag_resize_window(&self, _direction: ResizeDirection) -> Result<(), ExternalError> {
-        Err(ExternalError::NotSupported(NotSupportedError::new()))
+    pub fn drag_resize_window(&self, direction: ResizeDirection) -> Result<(), ExternalError> {
+        self.send_request(WindowRequest::DragResizeWindow(direction));
+
+        Ok(())
     }
 
     #[inline]

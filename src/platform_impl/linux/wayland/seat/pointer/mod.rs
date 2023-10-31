@@ -12,6 +12,7 @@ use sctk::reexports::protocols::unstable::relative_pointer::v1::client::zwp_rela
 use sctk::reexports::protocols::unstable::pointer_constraints::v1::client::zwp_pointer_constraints_v1::{ZwpPointerConstraintsV1, Lifetime};
 use sctk::reexports::protocols::unstable::pointer_constraints::v1::client::zwp_confined_pointer_v1::ZwpConfinedPointerV1;
 use sctk::reexports::protocols::unstable::pointer_constraints::v1::client::zwp_locked_pointer_v1::ZwpLockedPointerV1;
+use sctk::reexports::protocols::xdg_shell::client::xdg_toplevel::ResizeEdge;
 
 use sctk::seat::pointer::{ThemeManager, ThemedPointer};
 use sctk::window::Window;
@@ -19,7 +20,7 @@ use sctk::window::Window;
 use crate::event::ModifiersState;
 use crate::platform_impl::wayland::event_loop::WinitState;
 use crate::platform_impl::wayland::window::WinitFrame;
-use crate::window::CursorIcon;
+use crate::window::{CursorIcon, ResizeDirection};
 
 mod data;
 mod handlers;
@@ -212,6 +213,21 @@ impl WinitPointer {
         // WlPointer::setart_interactive_move() expects the last serial of *any*
         // pointer event (compare to set_cursor()).
         window.start_interactive_move(&self.seat, self.latest_serial.get());
+    }
+
+    pub fn drag_resize_window(&self, window: &Window<WinitFrame>, direction: ResizeDirection) {
+        // WlPointer::setart_interactive_resize() expects the last serial of *any*
+        // pointer event (compare to set_cursor()).
+        window.start_interactive_resize(&self.seat, self.latest_serial.get(), match direction {
+            ResizeDirection::East => ResizeEdge::Right,
+            ResizeDirection::North => ResizeEdge::Top,
+            ResizeDirection::NorthEast => ResizeEdge::TopRight,
+            ResizeDirection::NorthWest => ResizeEdge::TopLeft,
+            ResizeDirection::South => ResizeEdge::Bottom,
+            ResizeDirection::SouthEast => ResizeEdge::BottomRight,
+            ResizeDirection::SouthWest => ResizeEdge::BottomLeft,
+            ResizeDirection::West => ResizeEdge::Left,
+        });
     }
 }
 
