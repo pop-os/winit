@@ -8,7 +8,9 @@ use smol_str::SmolStr;
 
 use crate::{
     dpi::{PhysicalPosition, PhysicalSize},
+    event::KeyEvent,
     keyboard::Key,
+    platform::modifier_supplement::KeyEventExtModifierSupplement,
 };
 
 pub use self::event_loop::{EventLoop, EventLoopProxy, EventLoopWindowTarget};
@@ -268,4 +270,19 @@ impl VideoMode {
 pub struct KeyEventExtra {
     pub key_without_modifiers: Key,
     pub text_with_all_modifiers: Option<SmolStr>,
+}
+
+impl KeyEventExtModifierSupplement for KeyEvent {
+    #[inline]
+    fn text_with_all_modifiers(&self) -> Option<&str> {
+        self.platform_specific
+            .text_with_all_modifiers
+            .as_ref()
+            .map(|s| s.as_str())
+    }
+
+    #[inline]
+    fn key_without_modifiers(&self) -> Key {
+        self.platform_specific.key_without_modifiers.clone()
+    }
 }
