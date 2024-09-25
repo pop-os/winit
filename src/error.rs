@@ -100,7 +100,7 @@ pub struct NotSupportedError {
 }
 
 impl NotSupportedError {
-    pub(crate) fn new(reason: &'static str) -> Self {
+    pub fn new(reason: &'static str) -> Self {
         Self { reason }
     }
 }
