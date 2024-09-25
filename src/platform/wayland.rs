@@ -13,6 +13,12 @@
 //! * `wayland-csd-adwaita` (default).
 //! * `wayland-csd-adwaita-crossfont`.
 //! * `wayland-csd-adwaita-notitle`.
+use std::marker::PhantomData;
+use std::os::raw::c_void;
+use std::ptr::NonNull;
+
+use rwh_06::HandleError;
+
 use crate::event_loop::{ActiveEventLoop, EventLoop, EventLoopBuilder};
 use crate::monitor::MonitorHandle;
 pub use crate::window::Theme;
@@ -70,12 +76,40 @@ impl EventLoopBuilderExtWayland for EventLoopBuilder {
     }
 }
 
+pub struct XdgSurfaceHandle<'a> {
+    raw: NonNull<c_void>,
+    _marker: PhantomData<&'a ()>,
+}
+
+impl<'a> XdgSurfaceHandle<'a> {
+    /// Create a `XdgSurfaceHandle` from a [`NonNull<c_void>`]
+    pub unsafe fn borrow_raw(raw: NonNull<c_void>) -> Self {
+        Self { raw, _marker: PhantomData }
+    }
+
+    /// Get the underlying raw xdg_surface handle.
+    pub fn as_raw(&self) -> NonNull<c_void> {
+        self.raw
+    }
+}
+
+pub trait HasXdgSurfaceHandle {
+    fn xdg_surface_handle(&self) -> Result<XdgSurfaceHandle<'_>, HandleError>;
+}
+
 /// Additional methods on [`Window`] that are specific to Wayland.
 ///
 /// [`Window`]: crate::window::Window
-pub trait WindowExtWayland {}
+pub trait WindowExtWayland {
+    fn xdg_surface_handle<'a>(&'a self) -> Option<&dyn HasXdgSurfaceHandle>;
+}
 
-impl WindowExtWayland for dyn CoreWindow + '_ {}
+impl WindowExtWayland for dyn CoreWindow + '_ {
+    fn xdg_surface_handle(&self) -> Option<&dyn HasXdgSurfaceHandle> {
+        let window = self.as_any().downcast_ref::<crate::platform_impl::wayland::Window>();
+        window.map(|w| w as &dyn HasXdgSurfaceHandle)
+    }
+}
 
 /// Additional methods on [`WindowAttributes`] that are specific to Wayland.
 pub trait WindowAttributesExtWayland {

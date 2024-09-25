@@ -9,6 +9,7 @@ use sctk::reexports::client::protocol::wl_surface::WlSurface;
 use sctk::reexports::client::{Proxy, QueueHandle};
 use sctk::reexports::protocols::xdg::activation::v1::client::xdg_activation_v1::XdgActivationV1;
 use sctk::shell::xdg::window::{Window as SctkWindow, WindowDecorations};
+use sctk::shell::xdg::XdgSurface;
 use sctk::shell::WaylandSurface;
 use tracing::warn;
 
@@ -22,6 +23,7 @@ use crate::error::{NotSupportedError, RequestError};
 use crate::event::{Ime, WindowEvent};
 use crate::event_loop::AsyncRequestSerial;
 use crate::monitor::MonitorHandle as CoreMonitorHandle;
+use crate::platform::wayland::{HasXdgSurfaceHandle, XdgSurfaceHandle};
 use crate::platform_impl::{Fullscreen, MonitorHandle as PlatformMonitorHandle};
 use crate::window::{
     Cursor, CursorGrabMode, Fullscreen as CoreFullscreen, ImePurpose, ResizeDirection, Theme,
@@ -657,6 +659,19 @@ impl CoreWindow for Window {
     #[cfg(feature = "rwh_06")]
     fn rwh_06_window_handle(&self) -> &dyn rwh_06::HasWindowHandle {
         self
+    }
+}
+
+impl HasXdgSurfaceHandle for Window {
+    fn xdg_surface_handle(
+        &self,
+    ) -> Result<crate::platform::wayland::XdgSurfaceHandle<'_>, rwh_06::HandleError> {
+        let raw = {
+            let ptr = self.window.xdg_surface().id().as_ptr();
+            std::ptr::NonNull::new(ptr as *mut _).expect("wl_surface will never be null")
+        };
+
+        unsafe { Ok(XdgSurfaceHandle::borrow_raw(raw)) }
     }
 }
 
