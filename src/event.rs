@@ -156,6 +156,13 @@ pub enum WindowEvent {
     /// [`Window::surface_size`]: crate::window::Window::surface_size
     SurfaceResized(PhysicalSize<u32>),
 
+    /// The suggested bounds of the window's surface has changed.
+    ///
+    /// Contains the new bounds of the surface
+    ///
+    /// - **iOS / Android / Web / Orbital / Windows:** Unsupported.
+    SuggestedBounds(Option<PhysicalSize<u32>>),
+
     /// The position of the window has changed. Contains the window's new position.
     ///
     /// ## Platform-specific
