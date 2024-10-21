@@ -62,7 +62,7 @@ use crate::window::{ActivationToken, Theme, WindowId};
 /// See the module-level docs for more information on the event loop manages each event.
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum Event {
+pub enum Event {
     /// See [`ApplicationHandler::new_events`] for details.
     ///
     /// [`ApplicationHandler::new_events`]: crate::application::ApplicationHandler::new_events
