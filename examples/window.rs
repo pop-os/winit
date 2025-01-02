@@ -521,6 +521,7 @@ impl ApplicationHandler for Application {
             | WindowEvent::CursorEntered { .. }
             | WindowEvent::Destroyed
             | WindowEvent::Touch(_)
+            | WindowEvent::SuggestedBounds(_)
             | WindowEvent::Moved(_) => (),
         }
     }
