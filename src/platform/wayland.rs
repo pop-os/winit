@@ -101,7 +101,7 @@ pub trait HasXdgSurfaceHandle {
 ///
 /// [`Window`]: crate::window::Window
 pub trait WindowExtWayland {
-    fn xdg_surface_handle<'a>(&'a self) -> Option<&dyn HasXdgSurfaceHandle>;
+    fn xdg_surface_handle<'a>(&'a self) -> Option<&'a dyn HasXdgSurfaceHandle>;
 }
 
 impl WindowExtWayland for dyn CoreWindow + '_ {
