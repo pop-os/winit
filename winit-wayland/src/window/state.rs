@@ -69,6 +69,9 @@ pub struct WindowState {
     /// The pointers observed on the window.
     pub pointers: Vec<Weak<ThemedPointer<WinitPointerData>>>,
 
+    /// The seat and serial of the touch currently down on the window, if any.
+    pub touch_down: Option<(WlSeat, u32)>,
+
     selected_cursor: SelectedCursor,
 
     /// Whether the cursor is visible.
@@ -224,6 +227,7 @@ impl WindowState {
             min_surface_size: MIN_WINDOW_SIZE,
             pointer_constraints,
             pointers: Default::default(),
+            touch_down: None,
             queue_handle: queue_handle.clone(),
             resizable: true,
             scale_factor: 1.,
@@ -414,7 +418,11 @@ impl WindowState {
     pub fn drag_resize_window(&self, direction: ResizeDirection) -> Result<(), RequestError> {
         let xdg_toplevel = self.window.xdg_toplevel();
 
-        // TODO(kchibisov) handle touch serials.
+        if let Some((seat, serial)) = &self.touch_down {
+            xdg_toplevel.resize(seat, *serial, resize_direction_to_xdg(direction));
+            return Ok(());
+        }
+
         self.apply_on_pointer(|_, data| {
             let serial = data.latest_button_serial();
             let seat = data.seat();
@@ -427,7 +435,11 @@ impl WindowState {
     /// Start the window drag.
     pub fn drag_window(&self) -> Result<(), RequestError> {
         let xdg_toplevel = self.window.xdg_toplevel();
-        // TODO(kchibisov) handle touch serials.
+        if let Some((seat, serial)) = &self.touch_down {
+            xdg_toplevel._move(seat, *serial);
+            return Ok(());
+        }
+
         self.apply_on_pointer(|_, data| {
             let serial = data.latest_button_serial();
             let seat = data.seat();
@@ -916,7 +928,11 @@ impl WindowState {
     }
 
     pub fn show_window_menu(&self, position: LogicalPosition<u32>) {
-        // TODO(kchibisov) handle touch serials.
+        if let Some((seat, serial)) = &self.touch_down {
+            self.window.show_window_menu(seat, *serial, position.into());
+            return;
+        }
+
         self.apply_on_pointer(|_, data| {
             let serial = data.latest_button_serial();
             let seat = data.seat();
